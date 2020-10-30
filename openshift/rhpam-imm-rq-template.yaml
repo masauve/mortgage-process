@@ -1,0 +1,48 @@
+apiVersion: app.kiegroup.org/v2
+kind: KieApp
+metadata:
+  name: rhpam-production-immutable
+  namespace: pam-immutable
+spec:
+  environment: rhpam-production-immutable
+  commonConfig:
+    adminUser: xxxxxxxxxxx
+    adminPassword: xxxxxxxxxxx
+    keyStorePassword: xxxxxxxxxxx
+    amqClusterPassword: xxxxxxxxxxx
+    amqPassword: xxxxxxxxxxx
+  objects:
+    console:
+      keystoreSecret: businesscentral-app-secret
+      ssoClient:
+        name: rhpam-mon-console
+        secret: xxxxxxxxxxx  
+    servers:  
+      - deployments: 1
+        name: kieserver
+        ssoClient:
+          name: kieserver-imm
+          secret: xxxxxxxxxxx
+        build:
+          gitSource:
+            contextDir: project
+            reference: main
+            uri: 'https://github.com/masauve/mortgage-process.git'
+          kieServerContainerDeployment: >-
+            rhpam-kieserver-library=mortgage-process:mortgage-process:1.0.0-SNAPSHOT
+        database:
+          externalConfig:
+            backgroundValidation: 'false'
+            dialect: org.hibernate.dialect.PostgreSQL95Dialect
+            driver: postgresql
+            jdbcURL: 'xxxxxxxxxxx'
+            maxPoolSize: '100'
+            minPoolSize: '10'
+            password: xxxxxxxxxxx
+            username: rhpam
+          type: external
+  useImageTags: true
+  auth:
+    sso:
+      realm: rhpam
+      url: xxxxxxxxxxx
